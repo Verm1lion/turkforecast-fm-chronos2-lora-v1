@@ -1,0 +1,78 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Secrets / credentials -- NEVER commit
+.env
+.env.*
+*.pem
+*.key
+secrets/
+tokens/
+credentials/
+*hf_token*
+*api_key*
+
+# Model weights / large binaries -- pushed via HF Hub LFS, not git
+*.safetensors
+*.pt
+*.pth
+*.bin
+*.ckpt
+*.h5
+*.onnx
+
+# Data dumps
+*.parquet
+*.arrow
+data/
+datasets/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Logs
+*.log
+logs/
+tensorboard_logs/
+
+# OS
+*.DS_Store
+Thumbs.db
+desktop.ini
+
+# HF-only files (separate model card not in GitHub repo)
+HF_README.md
