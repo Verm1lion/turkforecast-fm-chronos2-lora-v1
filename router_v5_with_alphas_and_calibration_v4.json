@@ -1,0 +1,496 @@
+{
+  "schema_version": "1.1",
+  "predecessor_p55": "day11_p55_20260516_222959_617adc",
+  "predecessor_p56_v2": "day11_p56_v2_20260517_005853_c09420",
+  "predecessor_p56_v3": "day11_p56_v3_20260517_114933_8341be",
+  "p59_v2_run_id": "day11_p59_v2_20260517_203858_9f3c92",
+  "top10_roadmap_stage": "Stage_1_A_2_MASE_aware_adoption_rule",
+  "adoption_rule_v4": {
+    "primary_wql_gain": "wql_delta_pct < 0.0",
+    "secondary_mase_driven": "mase_delta_pct < -3.0 AND wql_delta_pct < 5.0",
+    "safety_override_blocks_wql_driven": "mase_delta_pct > 25.0"
+  },
+  "n_buckets_total": 21,
+  "n_buckets_calibration_adopted": 10,
+  "n_buckets_calibration_adopted_wql_driven": 9,
+  "n_buckets_calibration_adopted_mase_driven": 1,
+  "n_buckets_calibration_skipped": 11,
+  "calibrator_pkl_path": "c:/Users/MSI/Desktop/PROJELER/Kaggle_2\\run_day11_p56_v2_20260517_005853_c09420\\bucket_isotonic_calibrators.pkl",
+  "p55_alpha_source": "c:/Users/MSI/Desktop/PROJELER/Kaggle_2\\run_day11_p55_20260516_222959_617adc\\bucket_alpha_decision.jsonl",
+  "bucket_decisions": [
+    {
+      "bucket_key": [
+        "Econ/Fin",
+        "M_Q_Y"
+      ],
+      "bucket_key_str": "Econ/Fin/M_Q_Y",
+      "alpha": 0.5,
+      "alpha_group": "interior_blend",
+      "adopt_calibration": true,
+      "adoption_driver": "wql_gain",
+      "wql_delta_pct": -0.572,
+      "mase_delta_pct": 1.1172,
+      "n_datasets": 3,
+      "datasets": [
+        "m4_monthly",
+        "m4_quarterly",
+        "m4_yearly"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_ADOPT",
+      "adoption_reason": "WQL gain -0.57% adopted (MASE delta +1.12% acceptable)"
+    },
+    {
+      "bucket_key": [
+        "Energy",
+        "10T_15T"
+      ],
+      "bucket_key_str": "Energy/10T_15T",
+      "alpha": 1.0,
+      "alpha_group": "pure_ft",
+      "adopt_calibration": false,
+      "adoption_driver": "skip",
+      "wql_delta_pct": 1.519,
+      "mase_delta_pct": 1.6627,
+      "n_datasets": 4,
+      "datasets": [
+        "electricity/15T",
+        "ett1/15T",
+        "ett2/15T",
+        "solar/10T"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_SKIP",
+      "adoption_reason": "WQL loss +1.52% AND MASE loss +1.66% -- skip calibration, use raw blended forecast"
+    },
+    {
+      "bucket_key": [
+        "Energy",
+        "D"
+      ],
+      "bucket_key_str": "Energy/D",
+      "alpha": 1.0,
+      "alpha_group": "pure_ft",
+      "adopt_calibration": false,
+      "adoption_driver": "skip",
+      "wql_delta_pct": 1.4805,
+      "mase_delta_pct": 0.0732,
+      "n_datasets": 4,
+      "datasets": [
+        "electricity/D",
+        "ett1/D",
+        "ett2/D",
+        "solar/D"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_SKIP",
+      "adoption_reason": "WQL loss +1.48% AND MASE loss +0.07% -- skip calibration, use raw blended forecast"
+    },
+    {
+      "bucket_key": [
+        "Energy",
+        "H"
+      ],
+      "bucket_key_str": "Energy/H",
+      "alpha": 1.0,
+      "alpha_group": "pure_ft",
+      "adopt_calibration": false,
+      "adoption_driver": "skip",
+      "wql_delta_pct": 9.6556,
+      "mase_delta_pct": 12.3943,
+      "n_datasets": 4,
+      "datasets": [
+        "electricity/H",
+        "ett1/H",
+        "ett2/H",
+        "solar/H"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_SKIP",
+      "adoption_reason": "WQL loss +9.66% AND MASE loss +12.39% -- skip calibration, use raw blended forecast"
+    },
+    {
+      "bucket_key": [
+        "Energy",
+        "W"
+      ],
+      "bucket_key_str": "Energy/W",
+      "alpha": 0.0,
+      "alpha_group": "pure_zs",
+      "adopt_calibration": true,
+      "adoption_driver": "wql_gain",
+      "wql_delta_pct": -1.8561,
+      "mase_delta_pct": 10.3006,
+      "n_datasets": 4,
+      "datasets": [
+        "electricity/W",
+        "ett1/W",
+        "ett2/W",
+        "solar/W"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_ADOPT",
+      "adoption_reason": "WQL gain -1.86% adopted (MASE delta +10.30% acceptable)"
+    },
+    {
+      "bucket_key": [
+        "Healthcare",
+        "D"
+      ],
+      "bucket_key_str": "Healthcare/D",
+      "alpha": 0.5,
+      "alpha_group": "interior_blend",
+      "adopt_calibration": true,
+      "adoption_driver": "wql_gain",
+      "wql_delta_pct": -2.2309,
+      "mase_delta_pct": -9.5734,
+      "n_datasets": 2,
+      "datasets": [
+        "covid_deaths",
+        "us_births/D"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_ADOPT",
+      "adoption_reason": "WQL gain -2.23% adopted (MASE delta -9.57% acceptable)"
+    },
+    {
+      "bucket_key": [
+        "Healthcare",
+        "M_Q_Y"
+      ],
+      "bucket_key_str": "Healthcare/M_Q_Y",
+      "alpha": 0.0,
+      "alpha_group": "pure_zs",
+      "adopt_calibration": true,
+      "adoption_driver": "wql_gain",
+      "wql_delta_pct": -7.4717,
+      "mase_delta_pct": -11.7912,
+      "n_datasets": 2,
+      "datasets": [
+        "hospital",
+        "us_births/M"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_ADOPT",
+      "adoption_reason": "WQL gain -7.47% adopted (MASE delta -11.79% acceptable)"
+    },
+    {
+      "bucket_key": [
+        "Healthcare",
+        "W"
+      ],
+      "bucket_key_str": "Healthcare/W",
+      "alpha": 0.25,
+      "alpha_group": "interior_blend",
+      "adopt_calibration": true,
+      "adoption_driver": "wql_gain",
+      "wql_delta_pct": -6.2344,
+      "mase_delta_pct": 4.847,
+      "n_datasets": 1,
+      "datasets": [
+        "us_births/W"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_domain_fallback",
+      "v3_v4_delta": "KEPT_ADOPT",
+      "adoption_reason": "WQL gain -6.23% adopted (MASE delta +4.85% acceptable)"
+    },
+    {
+      "bucket_key": [
+        "Nature",
+        "10T_15T"
+      ],
+      "bucket_key_str": "Nature/10T_15T",
+      "alpha": 0.0,
+      "alpha_group": "pure_zs",
+      "adopt_calibration": true,
+      "adoption_driver": "wql_gain",
+      "wql_delta_pct": -3.1691,
+      "mase_delta_pct": 0.0,
+      "n_datasets": 1,
+      "datasets": [
+        "jena_weather/10T"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_domain_fallback",
+      "v3_v4_delta": "KEPT_ADOPT",
+      "adoption_reason": "WQL gain -3.17% adopted (MASE delta +0.00% acceptable)"
+    },
+    {
+      "bucket_key": [
+        "Nature",
+        "D"
+      ],
+      "bucket_key_str": "Nature/D",
+      "alpha": 0.0,
+      "alpha_group": "pure_zs",
+      "adopt_calibration": false,
+      "adoption_driver": "skip",
+      "wql_delta_pct": 0.4592,
+      "mase_delta_pct": -0.0598,
+      "n_datasets": 4,
+      "datasets": [
+        "jena_weather/D",
+        "kdd_cup_2018_with_missing/D",
+        "saugeenday/D",
+        "temperature_rain_with_missing"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_SKIP",
+      "adoption_reason": "WQL loss +0.46% AND MASE loss -0.06% -- skip calibration, use raw blended forecast"
+    },
+    {
+      "bucket_key": [
+        "Nature",
+        "H"
+      ],
+      "bucket_key_str": "Nature/H",
+      "alpha": 0.75,
+      "alpha_group": "interior_blend",
+      "adopt_calibration": false,
+      "adoption_driver": "skip",
+      "wql_delta_pct": 36.5555,
+      "mase_delta_pct": 66.5687,
+      "n_datasets": 2,
+      "datasets": [
+        "jena_weather/H",
+        "kdd_cup_2018_with_missing/H"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_SKIP",
+      "adoption_reason": "WQL loss +36.56% AND MASE loss +66.57% -- skip calibration, use raw blended forecast"
+    },
+    {
+      "bucket_key": [
+        "Nature",
+        "M_Q_Y"
+      ],
+      "bucket_key_str": "Nature/M_Q_Y",
+      "alpha": 0.0,
+      "alpha_group": "pure_zs",
+      "adopt_calibration": true,
+      "adoption_driver": "wql_gain",
+      "wql_delta_pct": -5.7578,
+      "mase_delta_pct": -12.977,
+      "n_datasets": 1,
+      "datasets": [
+        "saugeenday/M"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_domain_fallback",
+      "v3_v4_delta": "KEPT_ADOPT",
+      "adoption_reason": "WQL gain -5.76% adopted (MASE delta -12.98% acceptable)"
+    },
+    {
+      "bucket_key": [
+        "Nature",
+        "W"
+      ],
+      "bucket_key_str": "Nature/W",
+      "alpha": 1.0,
+      "alpha_group": "pure_ft",
+      "adopt_calibration": false,
+      "adoption_driver": "skip",
+      "wql_delta_pct": 5.2053,
+      "mase_delta_pct": 6.3593,
+      "n_datasets": 1,
+      "datasets": [
+        "saugeenday/W"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_domain_fallback",
+      "v3_v4_delta": "KEPT_SKIP",
+      "adoption_reason": "WQL loss +5.21% AND MASE loss +6.36% -- skip calibration, use raw blended forecast"
+    },
+    {
+      "bucket_key": [
+        "Sales",
+        "D"
+      ],
+      "bucket_key_str": "Sales/D",
+      "alpha": 0.0,
+      "alpha_group": "pure_zs",
+      "adopt_calibration": false,
+      "adoption_driver": "skip",
+      "wql_delta_pct": 0.5485,
+      "mase_delta_pct": 0.4508,
+      "n_datasets": 3,
+      "datasets": [
+        "hierarchical_sales/D",
+        "m4_daily",
+        "restaurant"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_SKIP",
+      "adoption_reason": "WQL loss +0.55% AND MASE loss +0.45% -- skip calibration, use raw blended forecast"
+    },
+    {
+      "bucket_key": [
+        "Sales",
+        "H"
+      ],
+      "bucket_key_str": "Sales/H",
+      "alpha": 0.5,
+      "alpha_group": "interior_blend",
+      "adopt_calibration": false,
+      "adoption_driver": "skip",
+      "wql_delta_pct": 1.24,
+      "mase_delta_pct": 1.3928,
+      "n_datasets": 1,
+      "datasets": [
+        "m4_hourly"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_SKIP",
+      "adoption_reason": "WQL loss +1.24% AND MASE loss +1.39% -- skip calibration, use raw blended forecast"
+    },
+    {
+      "bucket_key": [
+        "Sales",
+        "W"
+      ],
+      "bucket_key_str": "Sales/W",
+      "alpha": 0.25,
+      "alpha_group": "interior_blend",
+      "adopt_calibration": true,
+      "adoption_driver": "wql_gain",
+      "wql_delta_pct": -0.9038,
+      "mase_delta_pct": -1.6831,
+      "n_datasets": 2,
+      "datasets": [
+        "hierarchical_sales/W",
+        "m4_weekly"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_ADOPT",
+      "adoption_reason": "WQL gain -0.90% adopted (MASE delta -1.68% acceptable)"
+    },
+    {
+      "bucket_key": [
+        "Transport",
+        "10T_15T"
+      ],
+      "bucket_key_str": "Transport/10T_15T",
+      "alpha": 0.25,
+      "alpha_group": "interior_blend",
+      "adopt_calibration": false,
+      "adoption_driver": "skip",
+      "wql_delta_pct": 11.2961,
+      "mase_delta_pct": 11.8978,
+      "n_datasets": 2,
+      "datasets": [
+        "LOOP_SEATTLE/5T",
+        "SZ_TAXI/15T"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_SKIP",
+      "adoption_reason": "WQL loss +11.30% AND MASE loss +11.90% -- skip calibration, use raw blended forecast"
+    },
+    {
+      "bucket_key": [
+        "Transport",
+        "D"
+      ],
+      "bucket_key_str": "Transport/D",
+      "alpha": 0.25,
+      "alpha_group": "interior_blend",
+      "adopt_calibration": false,
+      "adoption_driver": "skip",
+      "wql_delta_pct": 1.7108,
+      "mase_delta_pct": -0.5386,
+      "n_datasets": 2,
+      "datasets": [
+        "LOOP_SEATTLE/D",
+        "M_DENSE/D"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_SKIP",
+      "adoption_reason": "WQL loss +1.71% AND MASE loss -0.54% -- skip calibration, use raw blended forecast"
+    },
+    {
+      "bucket_key": [
+        "Transport",
+        "H"
+      ],
+      "bucket_key_str": "Transport/H",
+      "alpha": 0.0,
+      "alpha_group": "pure_zs",
+      "adopt_calibration": false,
+      "adoption_driver": "skip",
+      "wql_delta_pct": 0.0926,
+      "mase_delta_pct": 0.3428,
+      "n_datasets": 3,
+      "datasets": [
+        "LOOP_SEATTLE/H",
+        "M_DENSE/H",
+        "SZ_TAXI/H"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_SKIP",
+      "adoption_reason": "WQL loss +0.09% AND MASE loss +0.34% -- skip calibration, use raw blended forecast"
+    },
+    {
+      "bucket_key": [
+        "Web/CloudOps",
+        "10T_15T"
+      ],
+      "bucket_key_str": "Web/CloudOps/10T_15T",
+      "alpha": 0.0,
+      "alpha_group": "pure_zs",
+      "adopt_calibration": true,
+      "adoption_driver": "wql_gain",
+      "wql_delta_pct": -1.503,
+      "mase_delta_pct": -1.9556,
+      "n_datasets": 3,
+      "datasets": [
+        "bitbrains_fast_storage/5T",
+        "bitbrains_rnd/5T",
+        "bizitobs_l2c/5T"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "KEPT_ADOPT",
+      "adoption_reason": "WQL gain -1.50% adopted (MASE delta -1.96% acceptable)"
+    },
+    {
+      "bucket_key": [
+        "Web/CloudOps",
+        "H"
+      ],
+      "bucket_key_str": "Web/CloudOps/H",
+      "alpha": 1.0,
+      "alpha_group": "pure_ft",
+      "adopt_calibration": true,
+      "adoption_driver": "mase_driven",
+      "wql_delta_pct": 0.6665,
+      "mase_delta_pct": -8.7695,
+      "n_datasets": 5,
+      "datasets": [
+        "bitbrains_fast_storage/H",
+        "bitbrains_rnd/H",
+        "bizitobs_application",
+        "bizitobs_l2c/H",
+        "bizitobs_service"
+      ],
+      "route_v5": "?",
+      "p56_v2_scope": "per_bucket",
+      "v3_v4_delta": "NEW_ADOPT_v4",
+      "adoption_reason": "MASE-driven gain -8.77% adopted (WQL +0.67% tolerable, < 5.0%)"
+    }
+  ]
+}
