@@ -9,7 +9,10 @@ peft==0.13.2
 accelerate==1.13.0
 chronos-forecasting==2.2.2
 gluonts==0.16.2
-datasets==4.0.0
+# datasets: loosened from training pin (4.0.0) to match salesforce-gift-eval upstream
+# requirement (~=2.17.1). Inference replicate.py does not use datasets for numerical
+# output; only HF Hub interop. Training pipeline (CLAUDE-internal Drive) keeps 4.0.0.
+datasets>=2.17,<3.0
 
 # Standard scientific stack (Colab defaults are compatible)
 numpy>=1.26,<2.0
