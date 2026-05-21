@@ -2,22 +2,24 @@
 # Tested on Python 3.10 / CUDA 12.4 / A100-SXM4-80GB Colab Pro+.
 # Tier 1.5 deterministic setup requires these exact versions.
 
+# Pins critical for INFERENCE numerical bit-equivalence (Chronos2 / LoRA / calibration math):
 torch==2.4.1
 torchvision==0.19.1
 transformers==4.46.3
 peft==0.13.2
 accelerate==1.13.0
 chronos-forecasting==2.2.2
-gluonts==0.16.2
-# datasets: loosened from training pin (4.0.0) to match salesforce-gift-eval upstream
-# requirement (~=2.17.1). Inference replicate.py does not use datasets for numerical
-# output; only HF Hub interop. Training pipeline (CLAUDE-internal Drive) keeps 4.0.0.
+
+# Loosened to match salesforce-gift-eval upstream pyproject.toml constraints
+# (training pipeline used stricter pins; inference does not need them for output equivalence):
+#   gift-eval requires: gluonts~=0.15.1, datasets~=2.17.1, numpy~=1.26.0, scipy~=1.11.3, pandas>=2.0
+gluonts>=0.15.1,<0.17
 datasets>=2.17,<3.0
 
-# Standard scientific stack (Colab defaults are compatible)
+# Standard scientific stack (gift-eval upstream constraints respected)
 numpy>=1.26,<2.0
 pandas>=2.0
-scipy>=1.11
+scipy>=1.11,<1.12
 
 # Calibration (P5.6 Kuleshov isotonic + pkl serialization)
 scikit-learn>=1.5
