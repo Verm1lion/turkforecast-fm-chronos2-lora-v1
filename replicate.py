@@ -441,7 +441,58 @@ def parse_args():
                    help=f"Per-dataset series cap (default {MAX_SERIES_PER_DS} matches release run)")
     p.add_argument("--gpu-required", action="store_true",
                    help="Fail if CUDA unavailable (default: warn + CPU fallback ~6-12h)")
+    p.add_argument("--gift-eval-dir", default=None,
+                   help="Path to local GIFT-Eval data directory. If unset, uses GIFT_EVAL env "
+                        "var, then falls back to auto-download from Salesforce/GiftEval (~5-10 GB). "
+                        "Recommended: pre-download via huggingface-cli for production.")
     return p.parse_args()
+
+
+def ensure_gift_eval_data(gift_eval_dir_arg=None):
+    """Ensure GIFT_EVAL env var points to a valid local data directory.
+
+    Priority: --gift-eval-dir CLI arg > GIFT_EVAL env var > auto-download to ~/.cache/gift_eval_data.
+
+    GIFT-Eval data is ~5-10 GB. Auto-download via huggingface_hub.snapshot_download from
+    Salesforce/GiftEval (HF dataset repo). Pre-download is recommended for production:
+        huggingface-cli download Salesforce/GiftEval --repo-type=dataset --local-dir <path>
+        export GIFT_EVAL=<path>
+    """
+    if gift_eval_dir_arg:
+        os.environ["GIFT_EVAL"] = str(gift_eval_dir_arg)
+        print(f"[+] GIFT_EVAL set from --gift-eval-dir: {gift_eval_dir_arg}")
+        return
+
+    existing = os.environ.get("GIFT_EVAL")
+    if existing:
+        if not Path(existing).is_dir():
+            print(f"[FATAL] GIFT_EVAL env var set to '{existing}' but directory does not exist.", file=sys.stderr)
+            sys.exit(1)
+        print(f"[+] GIFT_EVAL env var: {existing}")
+        return
+
+    # Auto-download fallback
+    default_dir = Path.home() / ".cache" / "gift_eval_data"
+    if default_dir.exists() and any(default_dir.iterdir()):
+        os.environ["GIFT_EVAL"] = str(default_dir)
+        print(f"[+] GIFT_EVAL auto-detected at cache: {default_dir}")
+        return
+
+    print(f"[!] GIFT_EVAL env var not set and no cache found at {default_dir}.")
+    print(f"[!] Auto-downloading Salesforce/GiftEval dataset (~5-10 GB) to {default_dir} ...")
+    print(f"[!] To skip future auto-downloads:")
+    print(f"      huggingface-cli download Salesforce/GiftEval --repo-type=dataset --local-dir <path>")
+    print(f"      export GIFT_EVAL=<path>")
+    try:
+        from huggingface_hub import snapshot_download
+        default_dir.mkdir(parents=True, exist_ok=True)
+        snapshot_download(repo_id="Salesforce/GiftEval", repo_type="dataset", local_dir=str(default_dir))
+        os.environ["GIFT_EVAL"] = str(default_dir)
+        print(f"[+] GIFT_EVAL auto-download complete: {default_dir}")
+    except Exception as e:
+        print(f"[FATAL] GIFT_EVAL auto-download failed: {type(e).__name__}: {e}", file=sys.stderr)
+        print(f"[FATAL] Please download manually and set the GIFT_EVAL env var (see instructions above).", file=sys.stderr)
+        sys.exit(1)
 
 
 def main():
@@ -456,6 +507,9 @@ def main():
     setup_deterministic()
     print(f"[+] Tier 1.5 determinism locked (seed={SEED}, math-SDP, no tf32)")
     print(f"[+] HF repo: {args.hf_repo}@{args.hf_revision}")
+
+    # ----- Ensure GIFT-Eval data dir is available (required by gift_eval.data.Dataset) -----
+    ensure_gift_eval_data(args.gift_eval_dir)
 
     # ----- Download all 7 pipeline artifacts (revision-pinned) -----
     print(f"[+] Downloading v1.1 pipeline artifacts (pinned revision={args.hf_revision}) ...")

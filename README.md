@@ -114,17 +114,25 @@ quantiles, _ = base.predict_quantiles(
 
 ### Replication
 
-Reproduce the full GIFT-Eval submission CSV from scratch (single command):
+Reproduce the full GIFT-Eval submission CSV from scratch:
 
 ```bash
 git clone https://github.com/Verm1lion/turkforecast-fm-chronos2-lora-v1
 cd turkforecast-fm-chronos2-lora-v1
 pip install -r requirements.txt
-python replicate.py --output all_results.csv          # full ~15-20 min A100
-python replicate.py --output all_results.csv --quick-test   # 2-dataset smoke ~2 min
+
+# Pre-download GIFT-Eval data (recommended; ~5-10 GB one-time):
+huggingface-cli download Salesforce/GiftEval --repo-type=dataset --local-dir ~/gift_eval_data
+export GIFT_EVAL=~/gift_eval_data
+
+# Then run end-to-end replication:
+python replicate.py --output all_results.csv               # full ~15-20 min A100
+python replicate.py --output all_results.csv --quick-test  # 2-dataset smoke ~2-5 min
 ```
 
 The script downloads all 7 v1.1 pipeline artifacts from HF Hub (pinned `revision="v1.1"`) and runs all 5 stages end-to-end. Output is the canonical 97-row GIFT-Eval `all_results.csv` with all 11 metrics finite.
+
+**Alternative**: omit the `huggingface-cli download` + `export GIFT_EVAL=...` steps; `replicate.py` will auto-download GIFT-Eval data to `~/.cache/gift_eval_data` on first run (~5-10 GB download). Or pass `--gift-eval-dir <path>` to specify a custom location explicitly.
 
 ## Training Recipe
 
