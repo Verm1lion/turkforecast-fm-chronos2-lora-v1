@@ -4,6 +4,10 @@ Single-command reproducer for the v1.1 pipeline submission CSV (97 canonical row
 Vendors the full v1.1 inference pipeline previously documented across multiple
 notebook builders, plus the MSIS NaN L3 fallback patch shipped with v1.1.
 
+Inference cap: first 50 series per dataset (matches submission CSV exactly; see
+MAX_SERIES_PER_DS constant). Pass `--max-series N` to override for ablations,
+but only `--max-series 50` is bit-equivalent to v1.1 submission.
+
 Pipeline (per short-term dataset):
   1. Load Chronos-2 fine-tuned (LoRA via PEFT) + Chronos-2 zero-shot baselines.
   2. Predict FT + ZS quantiles on each test window.
@@ -72,7 +76,7 @@ warnings.filterwarnings("ignore", category=UserWarning, module=r"gluonts.*")
 QLEV = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]   # GIFT-Eval 9-quantile standard
 MEDIAN_IDX = 4
 CTX_MAX = 2048
-MAX_SERIES_PER_DS = 200
+MAX_SERIES_PER_DS = 50    # Matches submission pipeline (P6.1 v9 builder cap); 50 series statistically sufficient per P5.5-P5.7 lineage
 SEED = 42
 HF_REPO_ID = "Verm1ion/turkforecast-fm-chronos2-lora-v1"
 HF_REVISION_DEFAULT = "v1.1"
@@ -212,11 +216,23 @@ def extract_univariate(target_arr):
     return arr.flatten()
 
 
-def load_test_window_entries(cfg_name, pred_len, max_series=MAX_SERIES_PER_DS):
+def load_test_window_entries(cfg_name, pred_len, max_series=MAX_SERIES_PER_DS, freq_bucket=None):
+    """Match P6.1 v9 builder load_dataset_test_window_short exactly (Cell line 870-903).
+
+    Per-freq threshold + no early-break + first-n_use slicing in caller mirrors P6.1's
+    deterministic series selection. Critical for multivariate datasets (bitbrains_*) where
+    looser threshold would inject shorter series into the first-50 sample, shifting MSE/MAE.
+    """
     from gift_eval.data import Dataset
     ds = Dataset(name=cfg_name, term="short", to_univariate=False)
+    # Per-freq threshold matching P6.1 v9 builder line 882
+    if freq_bucket in ("H", "10T_15T"):
+        threshold = max(48, pred_len + 24)
+    elif freq_bucket in ("D", "W"):
+        threshold = max(28, pred_len + 7)
+    else:
+        threshold = max(12, pred_len + 3)
     val_entries = []
-    threshold = pred_len + 15
     for entry in ds.training_dataset:
         target_raw = entry.get("target")
         if target_raw is None:
@@ -225,9 +241,8 @@ def load_test_window_entries(cfg_name, pred_len, max_series=MAX_SERIES_PER_DS):
         if cleaned is None or len(cleaned) < threshold:
             continue
         val_entries.append({"target": cleaned})
-        if len(val_entries) >= max_series:
-            break
-    return val_entries
+    # No early break — P6.1 collects all qualifying entries; caller slices [:max_series]
+    return val_entries[:max_series]
 
 
 @torch.no_grad()
@@ -595,7 +610,7 @@ def main():
             from gift_eval.data import Dataset
             probe_ds = Dataset(name=ds_name, term="short", to_univariate=False)
             pred_len = int(probe_ds.prediction_length)
-            val_entries = load_test_window_entries(ds_name, pred_len, max_series=args.max_series)
+            val_entries = load_test_window_entries(ds_name, pred_len, max_series=args.max_series, freq_bucket=dec["freq_bucket"])
             if not val_entries:
                 print(f"  [{idx+1}/{len(target_datasets)}] {ds_name:<35s} SKIP (no entries)")
                 continue

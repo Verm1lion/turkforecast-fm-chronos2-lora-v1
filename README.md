@@ -134,6 +134,8 @@ The script downloads all 7 v1.1 pipeline artifacts from HF Hub (pinned `revision
 
 **Alternative**: omit the `huggingface-cli download` + `export GIFT_EVAL=...` steps; `replicate.py` will auto-download GIFT-Eval data to `~/.cache/gift_eval_data` on first run (~5-10 GB download). Or pass `--gift-eval-dir <path>` to specify a custom location explicitly.
 
+> **Reproducibility note**: `replicate.py` defaults to `--max-series 50` per dataset, matching the v1.1 submission CSV exactly. The original P6.1 v9 inference pipeline used this cap for wallclock control (3-model ensemble bookkeeping) and statistical sufficiency was verified across P5.5-P5.7 lineage. Pass `--max-series 200` (or any other value) to evaluate on a larger sample for ablation studies, but note that outlier-sensitive metrics (MSE, MSIS, MAE) will differ substantially from the published `all_results.csv` while quantile-based metrics (wQL, MASE) stay within ~5% drift.
+
 ## Training Recipe
 
 - **Base:** `amazon/chronos-2` (120M params, T5 encoder)
