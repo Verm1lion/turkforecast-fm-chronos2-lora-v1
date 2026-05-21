@@ -71,31 +71,60 @@ Full per-dataset metrics: [`all_results.csv`](./all_results.csv).
 
 ## Inference Pipeline
 
-The model ships as a **3-stage inference pipeline** (not a monolithic adapter):
+The model ships as a **5-stage inference pipeline** (not a monolithic adapter):
 
-1. **Base + LoRA adapter** — `amazon/chronos-2` + LoRA `r=32, α=64, dropout=0` on all-linear `target_modules`
-2. **V4 router with WiSE-FT α-blend** ([`router_v5_with_alphas_and_calibration_v4.json`](./router_v5_with_alphas_and_calibration_v4.json)) — per-(domain, freq) bucket selects FT vs ZS vs blend α ∈ {0, 0.25, 0.5, 0.75, 1.0}; MASE-aware adoption rule (Stage 1.A.2): `adopt = (wql_delta<0) OR (mase_delta<−3 AND wql_delta<5)` over P5.7 v2 baseline
+1. **Base + LoRA adapter** — `amazon/chronos-2` + LoRA `r=32, α=64, dropout=0` on all-linear `target_modules` (loaded via `peft.PeftModel.from_pretrained` — see Quick start below)
+2. **V4 router with WiSE-FT α-blend** ([`router_v5_with_alphas_and_calibration_v4.json`](./router_v5_with_alphas_and_calibration_v4.json)) — per-(domain, freq) bucket selects FT vs ZS vs blend α ∈ {0, 0.25, 0.5, 0.75, 1.0}; MASE-aware adoption rule: `adopt = (wql_delta<0) OR (mase_delta<−3 AND wql_delta<5)` over P5.7 v2 baseline
 3. **Bucket isotonic calibrators** ([`bucket_isotonic_calibrators.pkl`](./bucket_isotonic_calibrators.pkl)) — per-bucket Kuleshov (ICML 2018) PIT-CDF isotonic regression on 9 quantile levels, with per-domain fallback for low-cardinality buckets
+4. **Q4 v1 per-domain conformal calibrator** ([`q4_domain_calibrators.pkl`](./q4_domain_calibrators.pkl)) — Variant-B per-quantile temperature scaling + Romano joint-score CQR with empirical-Bayes hierarchical shrinkage (κ=50) for 7 domains + global anchor
+5. **Horizon-CQR per-(dataset, horizon, quantile) deltas** ([`horizon_cqr_deltas.pkl`](./horizon_cqr_deltas.pkl)) — Bayesian-shrunk lower/upper tail widening, 34/54 datasets covered
+6. **Hard overrides** ([`pipeline_overrides.json`](./pipeline_overrides.json)) — small-magnitude datasets (`bizitobs_service/H`, `solar/10T`) preserve canonical Chronos-2 baseline ([`chronos2_reference_baseline.csv`](./chronos2_reference_baseline.csv)) to avoid relative-wQL amplification
 
-### Quick start
+Final step applies `np.sort(axis=quantile_axis, kind='stable')` Chernozhukov rearrangement for monotone quantiles.
+
+### Quick start (single-series inference)
 
 ```python
+import torch
 from chronos import BaseChronosPipeline
+from peft import PeftModel
 
-pipe = BaseChronosPipeline.from_pretrained(
-    "Verm1ion/turkforecast-fm-chronos2-lora-v1",
-    device_map="cuda", torch_dtype="bfloat16",
+# Stage 1: load Chronos-2 base + attach LoRA adapter via PEFT
+base = BaseChronosPipeline.from_pretrained(
+    "amazon/chronos-2",
+    device_map="cuda", torch_dtype=torch.bfloat16,
 )
-pipe.model.eval()
+base.model = PeftModel.from_pretrained(
+    base.model,
+    "Verm1ion/turkforecast-fm-chronos2-lora-v1",
+    revision="v1.1",   # pin reproducible revision
+)
+base.model.eval()
 
-quantiles, _ = pipe.predict_quantiles(
-    inputs=[your_context_array],
+# Single-series 9-quantile forecast
+quantiles, _ = base.predict_quantiles(
+    inputs=[your_context_array],          # shape [T,] historical values
     prediction_length=48,
     quantile_levels=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
 )
+# quantiles[0]: shape [pred_len, 9], rows = time, cols = quantile levels
 ```
 
-For full GIFT-Eval reproduction with V4 router + bucket calibrators, see [Replication](#replication).
+> **Note:** This Quick start covers Stage 1 only (base + LoRA). For full pipeline (Stages 2-6) with V4 router + bucket isotonic + Q4 v1 + Horizon-CQR + overrides, see [Replication](#replication) — `replicate.py` does it end-to-end with one command.
+
+### Replication
+
+Reproduce the full GIFT-Eval submission CSV from scratch (single command):
+
+```bash
+git clone https://github.com/Verm1lion/turkforecast-fm-chronos2-lora-v1
+cd turkforecast-fm-chronos2-lora-v1
+pip install -r requirements.txt
+python replicate.py --output all_results.csv          # full ~15-20 min A100
+python replicate.py --output all_results.csv --quick-test   # 2-dataset smoke ~2 min
+```
+
+The script downloads all 7 v1.1 pipeline artifacts from HF Hub (pinned `revision="v1.1"`) and runs all 5 stages end-to-end. Output is the canonical 97-row GIFT-Eval `all_results.csv` with all 11 metrics finite.
 
 ## Training Recipe
 
